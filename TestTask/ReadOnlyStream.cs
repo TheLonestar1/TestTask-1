@@ -1,11 +1,11 @@
-﻿using System;
+﻿ using System;
 using System.IO;
 
 namespace TestTask
 {
     public class ReadOnlyStream : IReadOnlyStream
     {
-        private Stream _localStream;
+        private readonly Stream _localStream;
 
         /// <summary>
         /// Конструктор класса. 
@@ -14,11 +14,9 @@ namespace TestTask
         /// </summary>
         /// <param name="fileFullPath">Полный путь до файла для чтения</param>
         public ReadOnlyStream(string fileFullPath)
-        {
-            IsEof = true;
-
+        {   
             // TODO : Заменить на создание реального стрима для чтения файла!
-            _localStream = null;
+            _localStream = new FileStream(fileFullPath, FileMode.Open, FileAccess.Read);
         }
                 
         /// <summary>
@@ -26,8 +24,16 @@ namespace TestTask
         /// </summary>
         public bool IsEof
         {
-            get; // TODO : Заполнять данный флаг при достижении конца файла/стрима при чтении
-            private set;
+            get
+            {
+                if (_localStream.Position == _localStream.Length)
+                {
+                    return true;
+                }
+                else
+                    return false;
+            } // TODO : Заполнять данный флаг при достижении конца файла/стрима при чтении
+            
         }
 
         /// <summary>
@@ -39,7 +45,15 @@ namespace TestTask
         public char ReadNextChar()
         {
             // TODO : Необходимо считать очередной символ из _localStream
-            throw new NotImplementedException();
+            String letter = "qwertyuiopasdfghjklzxcvbnmйцукенгшщзхъфывапролджэячсмить";
+            if (IsEof)
+                throw new Exception("Поток достиг конца файла");
+            var charepter = (char)_localStream.ReadByte();
+            while (!letter.Contains(charepter.ToString().ToLower()))
+            {
+                charepter = (char)_localStream.ReadByte();
+            }
+            return charepter;
         }
 
         /// <summary>
@@ -49,12 +63,14 @@ namespace TestTask
         {
             if (_localStream == null)
             {
-                IsEof = true;
                 return;
             }
-
             _localStream.Position = 0;
-            IsEof = false;
+        }
+
+        public void Dispose()
+        {
+            _localStream.Dispose();
         }
     }
 }

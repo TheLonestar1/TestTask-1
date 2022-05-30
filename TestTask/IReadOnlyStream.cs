@@ -11,6 +11,7 @@
 
         void ResetPositionToStart();
 
+        void Dispose();
         bool IsEof { get; }
     }
 }
